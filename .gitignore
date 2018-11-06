@@ -1,11 +1,14 @@
 # Prerequisites
 *.d
+*.html
+*.png
 
 # Object files
 *.o
 *.ko
 *.obj
 *.elf
+Objects/
 
 # Linker output
 *.ilk
