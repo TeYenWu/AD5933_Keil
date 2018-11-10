@@ -1,6 +1,6 @@
 #include "myUart.h"
 
-#define UART_BUFFER_LENGTH 128
+
 unsigned char uart_cmdBuf[UART_BUFFER_LENGTH] = {0};
 uint32_t uart_buffer_count = 0;
 
@@ -26,7 +26,7 @@ void myUartClose()
 	UART_DisableInt(UART_NUMBER, (UART_INTEN_RDAIEN_Msk | UART_INTEN_RXTOIEN_Msk));
 }
 
-void uartHandle()  
+void UART0_IRQHandler()  
 {
 	uint8_t u8InChar = 0xFF;
 	uint32_t u32IntSts = UART_NUMBER->INTSTS;

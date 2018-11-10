@@ -75,7 +75,6 @@ void Hard_Fault_Handler(uint32_t stack[])
 /*---------------------------------------------------------------------------------------------------------*/
 /* Routine to write a char                                                                                 */
 /*---------------------------------------------------------------------------------------------------------*/
-#define DEBUG_ENABLE_SEMIHOST
 #if defined(DEBUG_ENABLE_SEMIHOST)
 /* The static buffer is used to speed up the semihost    */
 static char g_buf[16];

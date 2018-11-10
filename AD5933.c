@@ -47,10 +47,10 @@ void I2C1_Stop()
 void AD5933_init()
 {
 	    /* Open I2C module and set bus clock */
-    I2C_Open(I2C1, 250000);
+    I2C_Open(I2C1, 300000);
 
     /* Get I2C1 Bus Clock */
-    printf("I2C clock %d Hz\n", I2C_GetBusClockFreq(I2C1));
+    //printf("I2C clock %d Hz\n", I2C_GetBusClockFreq(I2C1));
 
     /* Set I2C Slave Addresses */
     //I2C_SetSlaveAddr(I2C1, 0, AD5933_ADDR, 0);  
@@ -580,7 +580,7 @@ uint8_t AD5933_calibrate(double gain[], double phase[],
 		int i = 0;
     // For each point in the sweep, calculate the gain factor and phase
     for (i = 0; i < n; i++) {
-			  double magnitude = sqrt(real[i]*real[i] + imag[i]*imag[i]);
+			  double magnitude = sqrt((double)real[i]*real[i] + (double)imag[i]*imag[i]);
         gain[i] = (double)(1.0/(double)ref)/magnitude;
 				phase[i] = AD5933_calculate_phase(real[i], imag[i]);
     }

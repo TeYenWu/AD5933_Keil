@@ -10,6 +10,7 @@
 #endif
 
 #define UART_READ_TIMEOUT 2	//timeout = UART_READ_TIMEOUT * 200ms
+#define UART_BUFFER_LENGTH 128
 
 #define UART_CMD_NONE 0x00
 #define UART_CMD_SET_MUX 0x11
@@ -21,8 +22,9 @@
 #define UART_CMD_START_SWEEP 0x44
 #define UART_CMD_RECALIBRATION 0x45
 #define UART_CMD_SET_REF_RESIST 0x46
-#define UART_CMD_GET_REAL_PART 0x47
-#define UART_CMD_GET_IMEGINARY_PART 0x48
+#define UART_CMD_GET_IMPEDANCE_PART 0x47
+#define UART_CMD_GET_PHASE_PART 0x48
+#define UART_CMD_AD5933_RELEASE 0x49
 
 
 
@@ -33,7 +35,7 @@ extern void* memcpy(void*, const void*, unsigned int);
 
 void myUartOpen(void);
 void myUartClose(void);
-void uartHandle(void);
+void UART0_IRQHandler(void);
 
 void myUartSendDataByte(uint8_t *pu8TxBuf, uint32_t u32WriteBytes);
 void myUartDebugSend(const char* str);
