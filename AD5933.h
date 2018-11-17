@@ -1,6 +1,6 @@
 
 #include "M451Series.h"
-
+#include "myUart.h"
 /**
  * AD5933 Register Map
  *  Datasheet p23
@@ -94,7 +94,9 @@
 // Frequency sweep parameters
 #define AD5933_SWEEP_DELAY             (1
 
-static const unsigned int AD5933_clockSpeed = 16776000;
+#define AD5933_DEFAULT_CLOCK 16776000
+#define AD5933_EXTERNAL_CLOCK 345600
+static unsigned int AD5933_clockSpeed = AD5933_DEFAULT_CLOCK;
 
 void AD5933_init();
 void AD5933_deinit();
@@ -106,6 +108,7 @@ uint8_t AD5933_reset();
 uint8_t AD5933_enableTemperature(uint8_t enable);
 double AD5933_getTemperature();
 uint8_t AD5933_setClockSource(uint8_t source);
+uint8_t AD5933_setClockSpeed(unsigned int speed);
 uint8_t AD5933_setInternalClock(uint8_t internal);
 uint8_t AD5933_setStartFrequency(unsigned long start);
 uint8_t AD5933_setIncrementFrequency(unsigned long increment);

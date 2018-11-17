@@ -50,6 +50,12 @@ void myUartSendDataByte(uint8_t *pu8TxBuf, uint32_t u32WriteBytes)
 	writeCnt = UART_Write(UART_NUMBER, pu8TxBuf, u32WriteBytes);
 }
 
+void myUartSendByte(uint8_t pu8TxBuf)
+{
+
+	uint8_t data = pu8TxBuf;
+	UART_Write(UART_NUMBER, &data, 1);
+}
 
 
 

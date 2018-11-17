@@ -48,7 +48,8 @@ void AD5933_init()
 {
 	    /* Open I2C module and set bus clock */
     I2C_Open(I2C1, 300000);
-
+	
+		CLK_EnableCKO(CLK_CLKSEL1_CLKOSEL_HIRC, 5, 0);
     /* Get I2C1 Bus Clock */
     //printf("I2C clock %d Hz\n", I2C_GetBusClockFreq(I2C1));
 
@@ -66,6 +67,7 @@ void AD5933_init()
 void AD5933_deinit(){
 
 	I2C1_Close();
+	CLK_DisableCKO();
 }
 
 
@@ -164,7 +166,8 @@ uint8_t AD5933_getByte(uint8_t address, uint8_t *value) {
 		/* I2C as master sends START signal */
 		I2C1_Start();
 	
-		while(AD5933_EndFlag == 0);
+
+	while(AD5933_EndFlag == 0);
 
 	
 		if (AD5933_32Status == 0xFF){
@@ -308,11 +311,15 @@ double AD5933_getTemperature() {
  */
 uint8_t AD5933_setClockSource(uint8_t source) {
     // Determine what source was selected and set it appropriately
+		uint8_t val;
+    if (!AD5933_getByte(AD5933_CTRL_REG2, &val))
+        return 0;
+
     switch (source) {
         case AD5933_CLOCK_EXTERNAL:
-            return AD5933_sendByte(AD5933_CTRL_REG2, AD5933_CTRL_CLOCK_EXTERNAL);
+            return AD5933_sendByte(AD5933_CTRL_REG2, val | AD5933_CTRL_CLOCK_EXTERNAL);
         case AD5933_CLOCK_INTERNAL:
-            return AD5933_sendByte(AD5933_CTRL_REG2, AD5933_CTRL_CLOCK_INTERNAL);
+            return AD5933_sendByte(AD5933_CTRL_REG2, val | AD5933_CTRL_CLOCK_INTERNAL);
         default:
             return 0;
     }
@@ -326,10 +333,24 @@ uint8_t AD5933_setClockSource(uint8_t source) {
  */
 uint8_t AD5933_setInternalClock(uint8_t internal) {
     // This function is mainly a wrapper for setClockSource()
-    if (internal)
+    if (internal){
         return AD5933_setClockSource(AD5933_CLOCK_INTERNAL);
-    else
+		}
+    else{
         return AD5933_setClockSource(AD5933_CLOCK_EXTERNAL);
+		}
+}
+
+
+/**
+ * Set the clock speed.
+ *
+ * @param the clock speed.
+ * @return Success or failure
+ */
+uint8_t AD5933_setClockSpeed(unsigned int speed){
+		AD5933_clockSpeed = speed;
+		return 1;
 }
 
 /**
@@ -342,6 +363,14 @@ uint8_t AD5933_setStartFrequency(unsigned long start) {
     // Page 24 of the Datasheet gives the following formula to represent the
     // start frequency.
     // TODO: Precompute for better performance if we want to keep this constant.
+		if(start < 100000){
+			AD5933_setInternalClock(0);
+			AD5933_setClockSpeed(AD5933_EXTERNAL_CLOCK);
+		}
+		else{
+			AD5933_setInternalClock(1);
+			AD5933_setClockSpeed(AD5933_DEFAULT_CLOCK);
+		}
     long freqHex = (start / (AD5933_clockSpeed / 4.0))*pow(2, 27);
     if (freqHex > 0xFFFFFF) {
         return 0;   // overflow
@@ -359,7 +388,7 @@ uint8_t AD5933_setStartFrequency(unsigned long start) {
 }
 
 /**
- * Set the increment frequency for a frequency sweep.
+ * Set the increment frequency for a frequency sweep REQUIRED TO SET START FREQUENCY FIRST.
  *
  * @param start The frequency to increment by. Max of 0xFFFFFF.
  * @return Success or failure
@@ -581,10 +610,10 @@ uint8_t AD5933_calibrate(double gain[], double phase[],
     // For each point in the sweep, calculate the gain factor and phase
     for (i = 0; i < n; i++) {
 			  double magnitude = sqrt((double)real[i]*real[i] + (double)imag[i]*imag[i]);
-        gain[i] = (double)(1.0/(double)ref)/magnitude;
+        gain[i] = (double)(1.0/((double)ref*magnitude));
 				phase[i] = AD5933_calculate_phase(real[i], imag[i]);
     }
-
+		myUartSendByte(UART_CMD_CALIBRATION_COMPLETED);
     return 1;
 }
 

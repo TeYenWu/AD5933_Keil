@@ -25,6 +25,7 @@
 #define UART_CMD_GET_IMPEDANCE_PART 0x47
 #define UART_CMD_GET_PHASE_PART 0x48
 #define UART_CMD_AD5933_RELEASE 0x49
+#define UART_CMD_CALIBRATION_COMPLETED 0x50
 
 
 
@@ -38,5 +39,6 @@ void myUartClose(void);
 void UART0_IRQHandler(void);
 
 void myUartSendDataByte(uint8_t *pu8TxBuf, uint32_t u32WriteBytes);
+void myUartSendByte(uint8_t pu8TxBuf);
 void myUartDebugSend(const char* str);
 int myUartRead(char *data);
